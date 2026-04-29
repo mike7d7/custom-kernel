@@ -6,8 +6,10 @@
   };
 
   outputs =
-    inputs@{
+    {
+      self,
       nixpkgs,
+      nix-cachyos-kernel,
     }:
     let
       system = "x86_64-linux";
@@ -39,7 +41,7 @@
           };
           # helpers.nix provides a few utilities for building kernel with LTO.
           # I haven't figured out a clean way to expose it in flakes.
-          helpers = pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { };
+          helpers = pkgs.callPackage "${nix-cachyos-kernel.outPath}/helpers.nix" { };
         in
         helpers.kernelModuleLLVMOverride (pkgs.linuxKernel.packagesFor kernel);
     };
