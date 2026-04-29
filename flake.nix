@@ -1,6 +1,5 @@
 {
-  description = "A very basic flake";
-
+  description = "Custom kernel for nixos";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
@@ -15,7 +14,7 @@
       pkgs = nixpkgs.legacyPackages.${system};
     in
     {
-      packages.x86_64-linux.default =
+      packages.${system}.default =
         let
           kernel = pkgs.cachyosKernels.linux-cachyos-latest.override {
             # Customize CachyOS settings
@@ -43,6 +42,5 @@
           helpers = pkgs.callPackage "${inputs.nix-cachyos-kernel.outPath}/helpers.nix" { };
         in
         helpers.kernelModuleLLVMOverride (pkgs.linuxKernel.packagesFor kernel);
-
     };
 }
