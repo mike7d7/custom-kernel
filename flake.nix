@@ -18,8 +18,7 @@
     {
       packages.${system}.default =
         let
-          kernel = pkgs.cachyosKernels.linux-cachyos-latest.override {
-            # Customize CachyOS settings
+          kernelSet = pkgs.cachyosKernels.linux-cachyos-latest.override {
             cpusched = "eevdf";
             lto = "full";
             processorOpt = "x86_64-v3";
@@ -28,7 +27,6 @@
             hardened = false;
             autofdo = true;
             autoModules = false;
-            # Additional args are available. See kernel-cachyos/mkCachyKernel.nix
             structuredExtraConfig = {
               CONFIG_DEBUG_INFO = "n";
               CONFIG_DEBUG_KERNEL = "n";
@@ -39,10 +37,11 @@
               CONFIG_DEBUG_SLAB = "n";
             };
           };
-          # helpers.nix provides a few utilities for building kernel with LTO.
-          # I haven't figured out a clean way to expose it in flakes.
           helpers = pkgs.callPackage "${nix-cachyos-kernel.outPath}/helpers.nix" { };
+          kernelPackages = pkgs.linuxKernel.packagesFor kernelSet;
+
+          kernelDrv = helpers.kernelModuleLLVMOverride kernelPackages.kernel;
         in
-        helpers.kernelModuleLLVMOverride (pkgs.linuxKernel.packagesFor kernel);
+        kernelDrv;
     };
 }
