@@ -1,7 +1,8 @@
 {
-  description = "Custom kernel for nixos";
+  description = "CachyOS kernel flake for NixOS";
+
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
   };
 
@@ -10,10 +11,17 @@
       self,
       nixpkgs,
       nix-cachyos-kernel,
+      ...
     }:
     let
       system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
+
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [
+          nix-cachyos-kernel.overlays.pinned
+        ];
+      };
     in
     {
       packages.${system}.default =
@@ -27,21 +35,13 @@
             hardened = false;
             autofdo = true;
             autoModules = false;
-            structuredExtraConfig = {
-              CONFIG_DEBUG_INFO = "n";
-              CONFIG_DEBUG_KERNEL = "n";
-              CONFIG_DEBUG_ATOMIC_SLEEP = "n";
-              CONFIG_DEBUG_SPINLOCK = "n";
-              CONFIG_DEBUG_MUTEXES = "n";
-              CONFIG_DEBUG_RT_MUTEXES = "n";
-              CONFIG_DEBUG_SLAB = "n";
-            };
           };
-          helpers = pkgs.callPackage "${nix-cachyos-kernel.outPath}/helpers.nix" { };
-          kernelPackages = pkgs.linuxKernel.packagesFor kernelSet;
-
-          kernelDrv = helpers.kernelModuleLLVMOverride kernelPackages.kernel;
         in
-        kernelDrv;
+        (pkgs.linuxKernel.packagesFor kernelSet).kernel;
+
+      # Optional: export as overlay for NixOS flake import
+      overlays.pinned = {
+        cachyosKernels = pkgs.cachyosKernels;
+      };
     };
 }
