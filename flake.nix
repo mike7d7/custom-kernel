@@ -38,9 +38,5 @@
           };
         in
         (pkgs.linuxKernel.packagesFor kernelSet).kernel;
-
-      overlays.pinned = final: prev: {
-        cachyosKernels = pkgs.cachyosKernels;
-      };
     };
 }
