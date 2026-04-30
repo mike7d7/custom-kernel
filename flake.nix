@@ -36,11 +36,14 @@
             autofdo = true;
             autoModules = false;
           };
-        in
-        (pkgs.linuxKernel.packagesFor kernelSet).kernel;
 
-      # Optional: export as overlay for NixOS flake import
-      overlays.pinned = {
+          kernelCustom = pkgs.lib.overrideAttrs kernelSet (old: {
+            name = "linux-cachyos-custom-${old.version}";
+          });
+        in
+        (pkgs.linuxKernel.packagesFor kernelCustom).kernel;
+
+      overlays.pinned = final: prev: {
         cachyosKernels = pkgs.cachyosKernels;
       };
     };
