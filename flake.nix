@@ -36,12 +36,8 @@
             autofdo = true;
             autoModules = false;
           };
-
-          kernelCustom = pkgs.lib.overrideAttrs kernelSet (old: {
-            name = "linux-cachyos-custom-${old.version}";
-          });
         in
-        (pkgs.linuxKernel.packagesFor kernelCustom).kernel;
+        (pkgs.linuxKernel.packagesFor kernelSet).kernel;
 
       overlays.pinned = final: prev: {
         cachyosKernels = pkgs.cachyosKernels;
