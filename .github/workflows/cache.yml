@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
 
-      - uses: randymarsh77/static-nix-cache/setup@v1
+      - uses: randymarsh77/static-nix-cache/setup@main
 
       - name: Build
         run: nix build
