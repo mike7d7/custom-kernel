@@ -1,0 +1,37 @@
+name: Deploy Cache
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - uses: randymarsh77/static-nix-cache/setup@v1
+
+      - name: Build
+        run: nix build
+
+      - uses: randymarsh77/static-nix-cache/deploy@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          static: ./site
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+      - uses: actions/deploy-pages@v4
+        id: pages
