@@ -24,7 +24,7 @@ jobs:
       - name: Build
         run: nix build
 
-      - uses: randymarsh77/static-nix-cache/deploy@v1
+      - uses: randymarsh77/static-nix-cache/deploy@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           static: ./site
