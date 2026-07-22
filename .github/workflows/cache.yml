@@ -27,6 +27,7 @@ jobs:
       - uses: randymarsh77/static-nix-cache/deploy@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          signing-key: ${{ secrets.NIX_SIGNING_KEY }}
           static: ./site
 
       - uses: actions/upload-pages-artifact@v3
