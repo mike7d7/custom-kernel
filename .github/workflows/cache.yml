@@ -20,12 +20,12 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
-      - uses: randymarsh77/static-nix-cache/setup@master
+      - uses: adampoit/static-nix-cache/setup@master
 
       - name: Build
         run: nix build
 
-      - uses: randymarsh77/static-nix-cache/deploy@master
+      - uses: adampoit/static-nix-cache/deploy@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           signing-key: ${{ secrets.NIX_SIGNING_KEY }}
