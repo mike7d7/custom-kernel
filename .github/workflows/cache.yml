@@ -35,6 +35,10 @@ jobs:
           signing-key: ${{ secrets.NIX_SIGNING_KEY }}
           static: ./site
 
+      - name: Fix empty References fields in narinfo files
+        run: |
+          find ./site -name "*.narinfo" -exec sed -i 's/^References:$/References: /' {} +
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./site
