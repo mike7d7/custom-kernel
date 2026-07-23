@@ -27,6 +27,7 @@ jobs:
 
       - uses: adampoit/static-nix-cache/deploy@master
         with:
+          paths-file: /tmp/paths.txt
           github-token: ${{ secrets.GITHUB_TOKEN }}
           signing-key: ${{ secrets.NIX_SIGNING_KEY }}
           static: ./site
