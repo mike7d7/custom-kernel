@@ -22,11 +22,11 @@ jobs:
 
       # - uses: adampoit/static-nix-cache/setup@master
 
-      - name: Build
-        run: nix build
+      - name: Build kernel (all outputs)
+        run: nix build '.#default^*' --print-out-paths > /tmp/output-paths.txt
 
       - name: Generate paths file
-        run: nix path-info -r . > /tmp/paths.txt
+        run: nix path-info -r $(cat /tmp/output-paths.txt) > /tmp/paths.txt
 
       - uses: adampoit/static-nix-cache/deploy@master
         with:
