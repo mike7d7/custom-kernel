@@ -28,6 +28,20 @@ jobs:
 
       - name: Generate paths file
         run: nix path-info -r $(cat /tmp/output-paths.txt) > /tmp/paths.txt
+        
+      - name: Filter out paths already on cache.nixos.org
+        run: |
+          : > /tmp/paths.txt
+          while read -r p; do
+            hash=$(basename "$p" | head -c 32)
+            if curl -sf -o /dev/null "https://cache.nixos.org/${hash}.narinfo"; then
+              echo "Skipping (already on cache.nixos.org): $p"
+            else
+              echo "$p" >> /tmp/paths.txt
+            fi
+          done < /tmp/all-paths.txt
+          echo "Deploying $(wc -l < /tmp/paths.txt) of $(wc -l < /tmp/all-paths.txt) paths"
+
 
       - uses: adampoit/static-nix-cache/deploy@master
         with:
