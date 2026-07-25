@@ -21,45 +21,16 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
-      # - uses: adampoit/static-nix-cache/setup@master
+      - uses: randymarsh77/static-nix-cache/setup@master
 
-      - name: Build kernel (all outputs)
-        run: nix build '.#default^*' --print-out-paths > /tmp/output-paths.txt
-      
-      - name: Generate full paths list
-        run: nix path-info -r $(cat /tmp/output-paths.txt) > /tmp/all-paths.txt
-      
-      - name: Filter out paths already on cache.nixos.org
-        run: |
-          : > /tmp/paths.txt
-          while read -r p; do
-            hash=$(basename "$p" | head -c 32)
-            if curl -sf -o /dev/null "https://cache.nixos.org/${hash}.narinfo"; then
-              echo "Skipping (already on cache.nixos.org): $p"
-            else
-              echo "$p" >> /tmp/paths.txt
-            fi
-          done < /tmp/all-paths.txt
-          echo "Deploying $(wc -l < /tmp/paths.txt) of $(wc -l < /tmp/all-paths.txt) paths"
-      
-      - uses: adampoit/static-nix-cache/deploy@master
+      - name: Build
+        run: nix build
+
+      - uses: randymarsh77/static-nix-cache/deploy@master
         with:
-          paths-file: /tmp/paths.txt
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           signing-key: ${{ secrets.NIX_SIGNING_KEY }}
-          static: ./site
-
-
-      - uses: adampoit/static-nix-cache/deploy@master
-        with:
-          paths-file: /tmp/paths.txt
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          signing-key: ${{ secrets.NIX_SIGNING_KEY }}
           static: ./site
-
-      - name: Fix empty References fields in narinfo files
-        run: |
-          find ./site -name "*.narinfo" -exec sed -i 's/^References:$/References: /' {} +
 
       - uses: actions/upload-pages-artifact@v3
         with:
