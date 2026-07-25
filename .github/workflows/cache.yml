@@ -25,10 +25,10 @@ jobs:
 
       - name: Build kernel (all outputs)
         run: nix build '.#default^*' --print-out-paths > /tmp/output-paths.txt
-
-      - name: Generate paths file
-        run: nix path-info -r $(cat /tmp/output-paths.txt) > /tmp/paths.txt
-        
+      
+      - name: Generate full paths list
+        run: nix path-info -r $(cat /tmp/output-paths.txt) > /tmp/all-paths.txt
+      
       - name: Filter out paths already on cache.nixos.org
         run: |
           : > /tmp/paths.txt
@@ -41,6 +41,13 @@ jobs:
             fi
           done < /tmp/all-paths.txt
           echo "Deploying $(wc -l < /tmp/paths.txt) of $(wc -l < /tmp/all-paths.txt) paths"
+      
+      - uses: adampoit/static-nix-cache/deploy@master
+        with:
+          paths-file: /tmp/paths.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          signing-key: ${{ secrets.NIX_SIGNING_KEY }}
+          static: ./site
 
 
       - uses: adampoit/static-nix-cache/deploy@master
