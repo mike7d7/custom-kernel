@@ -29,13 +29,31 @@ jobs:
       - name: Generate paths file
         run: nix path-info -r $(cat /tmp/output-paths.txt) > /tmp/paths.txt
 
-        # temp
-      - name: Check signing key
+      - name: Sign store paths
         env:
           NIX_SIGNING_KEY: ${{ secrets.NIX_SIGNING_KEY }}
         run: |
-          printf '%s\n' "$NIX_SIGNING_KEY" | nix key convert-secret-to-public
+          set -euo pipefail
 
+          printf '%s\n' "$NIX_SIGNING_KEY" > /tmp/cache-key
+          chmod 600 /tmp/cache-key
+
+          while IFS= read -r path; do
+            echo "Signing: $path"
+            nix store sign \
+              --key-file /tmp/cache-key \
+              "$path"
+          done < /tmp/paths.txt
+          
+      - name: Verify signatures
+        env:
+          NIX_SIGNING_KEY: ${{ secrets.NIX_SIGNING_KEY }}
+        run: |
+          nix store verify \
+            --recursive \
+            --trusted-public-keys "$(printf '%s\n' "$NIX_SIGNING_KEY" | nix key convert-secret-to-public)" \
+            $(cat /tmp/output-paths.txt)
+            
       - uses: randymarsh77/static-nix-cache/deploy@master
         with:
           paths-file: /tmp/paths.txt
