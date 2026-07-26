@@ -31,6 +31,7 @@ jobs:
             
       - uses: randymarsh77/static-nix-cache/deploy@master
         with:
+          signing-key: ${{ secrets.NIX_SIGNING_KEY }}
           paths-file: /tmp/paths.txt
           github-token: ${{ secrets.GITHUB_TOKEN }}
           static: ./site
