@@ -45,19 +45,14 @@ jobs:
               "$path"
           done < /tmp/paths.txt
           
-      - name: Verify signatures
-        env:
-          NIX_SIGNING_KEY: ${{ secrets.NIX_SIGNING_KEY }}
-        run: |
-          nix store verify \
-            --recursive \
-            --trusted-public-keys "$(printf '%s\n' "$NIX_SIGNING_KEY" | nix key convert-secret-to-public)" \
-            $(cat /tmp/output-paths.txt)
+      - name: Cache Nix Binaries
+        uses: randymarsh77/static-nix-cache/save@v1
+        with:
+          signing-key: ${{ secrets.NIX_SIGNING_KEY }}
             
       - uses: randymarsh77/static-nix-cache/deploy@master
         with:
-          paths-file: /tmp/paths.txt
-          signing-key: ${{ secrets.NIX_SIGNING_KEY }}
+          #paths-file: /tmp/paths.txt
           github-token: ${{ secrets.GITHUB_TOKEN }}
           static: ./site
 
