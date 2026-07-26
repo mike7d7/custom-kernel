@@ -29,6 +29,13 @@ jobs:
       - name: Generate paths file
         run: nix path-info -r $(cat /tmp/output-paths.txt) > /tmp/paths.txt
 
+        # temp
+      - name: Check signing key
+        env:
+          NIX_SIGNING_KEY: ${{ secrets.NIX_SIGNING_KEY }}
+        run: |
+          printf '%s\n' "$NIX_SIGNING_KEY" | nix key convert-secret-to-public
+
       - uses: randymarsh77/static-nix-cache/deploy@master
         with:
           paths-file: /tmp/paths.txt
