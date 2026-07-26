@@ -23,11 +23,15 @@ jobs:
 
       - uses: randymarsh77/static-nix-cache/setup@master
 
-      - name: Build
-        run: nix build
+      - name: Build kernel (all outputs)
+        run: nix build '.#default^*' --print-out-paths > /tmp/output-paths.txt
+
+      - name: Generate paths file
+        run: nix path-info -r $(cat /tmp/output-paths.txt) > /tmp/paths.txt
 
       - uses: randymarsh77/static-nix-cache/deploy@master
         with:
+          paths-file: /tmp/paths.txt
           signing-key: ${{ secrets.NIX_SIGNING_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           static: ./site
