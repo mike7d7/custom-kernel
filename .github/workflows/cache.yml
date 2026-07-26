@@ -52,7 +52,7 @@ jobs:
             
       - uses: randymarsh77/static-nix-cache/deploy@master
         with:
-          #paths-file: /tmp/paths.txt
+          paths-file: /tmp/paths.txt
           github-token: ${{ secrets.GITHUB_TOKEN }}
           static: ./site
 
