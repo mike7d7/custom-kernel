@@ -1,9 +1,10 @@
-name: Deploy Cache
+name: Publish Nix Binary Cache
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -11,34 +12,147 @@ permissions:
   id-token: write
 
 jobs:
-  build-and-deploy:
+  build-cache:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.pages.outputs.page_url }}
+
+    env:
+      CACHE_DIR: cache
+      RELEASE_TAG: binary-cache
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
-      - uses: randymarsh77/static-nix-cache/setup@master
+      - name: Write signing key
+        run: |
+          cat > "$RUNNER_TEMP/cache-key.pem" <<'EOF'
+          ${{ secrets.NIX_CACHE_PRIVATE_KEY }}
+          EOF
+          chmod 600 "$RUNNER_TEMP/cache-key.pem"
 
-      - name: Build kernel (all outputs)
-        run: nix build '.#default^*' --print-out-paths > /tmp/output-paths.txt
+      - name: Build flake
+        # Note: Changed from '^*' to just '.#default' to avoid pulling in 'dev' dependencies.
+        # If you truly need all outputs, you can change it back to '.#default^*'.
+        run: nix build '.#default' --print-out-paths > /tmp/output-paths.txt
 
-      - name: Generate paths file
-        run: nix path-info -r $(cat /tmp/output-paths.txt) > /tmp/paths.txt
+      - name: Export signed cache
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$CACHE_DIR"
+      
+          BASE_URL="https://github.com/$OWNER/$REPO/releases/download/$RELEASE_TAG"
+          NIXOS_CACHE="https://cache.nixos.org"
+      
+          # Get the runtime closure of the built outputs
+          mapfile -t closure < <(nix path-info -r $(cat /tmp/output-paths.txt))
+      
+          paths=()
+          for path in "${closure[@]}"; do
+            # Check if the path is already in cache.nixos.org
+            if nix path-info --store "$NIXOS_CACHE" "$path" >/dev/null 2>&1; then
+              echo "skip  (in cache.nixos.org): $path"
+            else
+              echo "keep  (missing upstream) : $path"
+              paths+=("$path")
+            fi
+          done
+      
+          if [ "${#paths[@]}" -eq 0 ]; then
+            echo "Everything is already available from cache.nixos.org"
+            exit 0
+          fi
+      
+          # 1. Copy to local directory
+          nix copy \
+            --to "file://$PWD/$CACHE_DIR?secret-key=$RUNNER_TEMP/cache-key.pem" \
+            "${paths[@]}"
+
+          # 2. Robustly rewrite the URL: field to absolute GitHub Releases URLs
+          echo "Rewriting .narinfo URLs to point to GitHub Releases..."
+          for narinfo in "$CACHE_DIR"/*.narinfo; do
+            # Extract the NAR filename (e.g. 08rz4...nar.xz)
+            nar_path=$(grep '^URL:' "$narinfo" | cut -d' ' -f2)
+            nar_filename=$(basename "$nar_path")
             
-      - uses: randymarsh77/static-nix-cache/deploy@master
+            # Overwrite the URL line with the absolute GitHub Releases URL
+            sed -i "s|^URL:.*|URL: $BASE_URL/$nar_filename|" "$narinfo"
+            
+            # Print the result to the CI logs so we can prove it worked
+            echo "  - $(basename "$narinfo") -> $BASE_URL/$nar_filename"
+          done
+
+      - name: Verify signatures
+        run: |
+          grep '^Sig:' cache/*.narinfo
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
         with:
-          signing-key: ${{ secrets.NIX_SIGNING_KEY }}
-          paths-file: /tmp/paths.txt
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          static: ./site
+          tag_name: ${{ env.RELEASE_TAG }}
+          make_latest: false
+          draft: false
+
+      - name: Clean previous release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get all existing asset names in the release
+          assets=$(gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' 2>/dev/null || true)
+          if [ -n "$assets" ]; then
+            echo "Deleting old assets to prevent hitting the 1000 file limit..."
+            for asset in $assets; do
+              gh release delete-asset "$RELEASE_TAG" "$asset" --yes
+            done
+          fi
+
+      - name: Upload NARs to Releases (Sequential with Retries)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          
+          # Only upload the large .nar files to GitHub Releases
+          for nar in "$CACHE_DIR"/nar/*; do
+            echo "Uploading $nar..."
+            for i in 1 2 3 4 5; do
+              if gh release upload "$RELEASE_TAG" "$nar" --clobber; then
+                break
+              fi
+              echo "Rate limited or failed. Retrying in $((i*15)) seconds..."
+              sleep $((i*15))
+            done
+          done
+
+      - name: Prepare Pages
+        run: |
+          mkdir -p pages
+          # Only upload info files to GitHub Pages
+          cp "$CACHE_DIR"/nix-cache-info pages/ || true
+          cp "$CACHE_DIR"/*.narinfo pages/ || true
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: ./site
+          path: pages
 
-      - uses: actions/deploy-pages@v4
-        id: pages
+  deploy:
+    needs: build-cache
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
