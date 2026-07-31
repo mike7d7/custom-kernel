@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,10 +45,12 @@ jobs:
           tar -czf nix-cache.tar.gz -C /tmp nix-cache
 
       - name: Delete previous release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: dev-drprasad/delete-tag-and-release@v0.2.1
         with:
           tag_name: nix-cache
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ env.GITHUB_TOKEN }}
           delete_release: true
 
       - name: Upload to GitHub Releases
