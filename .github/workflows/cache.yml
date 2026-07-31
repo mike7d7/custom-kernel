@@ -35,12 +35,7 @@ jobs:
         run: |
           mkdir -p /tmp/nix-cache
           
-          # Write the secret key
-          echo "${{ secrets.NIX_CACHE_PRIVATE_KEY }}" > /tmp/secret-key-file
-          
-          # Export the built result AND its dependencies to a file-based cache
-          # This signs the paths with your secret key
-          nix copy --to file:///tmp/nix-cache?secret-key-file=/tmp/secret-key-file $(readlink -f result)
+          nix copy --to file:///tmp/nix-cache $(readlink -f result)
           
           tar -czf nix-cache.tar.gz -C /tmp nix-cache
 
