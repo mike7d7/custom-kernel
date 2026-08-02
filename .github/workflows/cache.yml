@@ -34,8 +34,9 @@ jobs:
       - name: Export and Compress Cache
         run: |
           mkdir -p /tmp/nix-cache
-          
-          nix copy --to file:///tmp/nix-cache $(readlink -f result)
+          paths=$(nix build .#default^* --no-link --print-out-paths)
+
+          nix copy --to file:///tmp/nix-cache $paths
           
           tar -czf nix-cache.tar.gz -C /tmp nix-cache
 
