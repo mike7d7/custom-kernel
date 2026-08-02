@@ -1,102 +1,59 @@
-name: Publish Nix Binary Cache
+name: Build and Publish Nix Cache
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: nix-cache
-  cancel-in-progress: false
-
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: cachix/install-nix-action@v27
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
         with:
+          nix_path: nixpkgs=channel:nixos-unstable
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Build
+      # ---> NEW STEP: Magic Nix Cache <---
+      - name: Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v8
+        with:
+          diagnostic-endpoint: ""
+
+      - name: Build Flake
+        run: nix build .#default
+
+      - name: Export and Compress Cache
         run: |
-          nix build .#default
-
-      - name: Export cache
-        env:
-          PRIVATE_KEY: ${{ secrets.NIX_CACHE_PRIVATE_KEY }}
-        run: |
-          mkdir pages
-          mkdir release
-
-          printf '%s\n' "$PRIVATE_KEY" > cache.key
-
-          nix copy \
-            --to "file://$PWD/export?secret-key=$PWD/cache.key&compression=xz" \
-            $(nix path-info .#default)
-
-          cat > pages/nix-cache-info <<EOF
-          StoreDir: /nix/store
-          WantMassQuery: 1
-          Priority: 30
-          EOF
-
-          BASE="https://github.com/${{ github.repository }}/releases/download/nix-cache"
-
-          shopt -s nullglob
-
-          for f in export/*.narinfo; do
-              cp "$f" pages/
-
-              nar=$(awk '/^URL:/ {print $2}' "$f")
-
-              narfile=$(basename "$nar")
-
-              sed -i \
-                "s|^URL:.*|URL: ${BASE}/${narfile}|" \
-                "pages/$(basename "$f")"
-          done
-
-          mv export/*.nar* release/
-
-      #
-      # Replace release
-      #
+          mkdir -p /tmp/nix-cache
+          
+          nix copy --to file:///tmp/nix-cache $(readlink -f result)
+          
+          tar -czf nix-cache.tar.gz -C /tmp nix-cache
 
       - name: Delete previous release
-        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: dev-drprasad/delete-tag-and-release@v0.2.1
         with:
           tag_name: nix-cache
+          github_token: ${{ env.GITHUB_TOKEN }}
           delete_release: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish release
+      - name: Upload to GitHub Releases
         uses: softprops/action-gh-release@v2
         with:
           tag_name: nix-cache
           name: Nix Binary Cache
+          files: nix-cache.tar.gz
           make_latest: false
-          files: release/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      #
-      # Publish Pages
-      #
-
-      - uses: actions/configure-pages@v5
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: pages
-
-      - uses: actions/deploy-pages@v4
