@@ -76,10 +76,16 @@
           BRCMFMAC = pkgs.lib.mkForce no;
           BRCMSMAC = pkgs.lib.mkForce no;
           MT76_CORE = pkgs.lib.mkForce no;
-          WLAN_VENDOR_MEDIATEK = pkgs.lib.mkForce no;
-          WLAN_VENDOR_REALTEK = pkgs.lib.mkForce no;
           WLAN_VENDOR_ATH = pkgs.lib.mkForce no;
           WLAN_VENDOR_BROADCOM = pkgs.lib.mkForce no;
+          WLAN_VENDOR_MEDIATEK = pkgs.lib.mkForce no;
+          WLAN_VENDOR_REALTEK = pkgs.lib.mkForce no;
+          WLAN_VENDOR_RALINK = pkgs.lib.mkForce no;
+          WLAN_VENDOR_MARVELL = pkgs.lib.mkForce no;
+          WLAN_VENDOR_TI = pkgs.lib.mkForce no;
+          WLAN_VENDOR_ZYDAS = pkgs.lib.mkForce no;
+          WLAN_VENDOR_MICROCHIP = pkgs.lib.mkForce no;
+          WLAN_VENDOR_ST = pkgs.lib.mkForce no;
 
           # Legacy/unused bus & hardware support
           PARPORT = pkgs.lib.mkForce no;
@@ -89,6 +95,7 @@
 
           # PATA
           ATA_SFF = pkgs.lib.mkForce no;
+          ATA = pkgs.lib.mkForce no;
 
           # Legacy sound drivers
           SND_ISA = pkgs.lib.mkForce no;
@@ -145,6 +152,17 @@
           QNX6FS_FS = pkgs.lib.mkForce no;
           HPFS_FS = pkgs.lib.mkForce no;
           NILFS2_FS = pkgs.lib.mkForce no;
+
+          FIREWIRE = pkgs.lib.mkForce no;
+          IEEE1394 = pkgs.lib.mkForce no;
+
+          # USB optical drives
+          BLK_DEV_SR = pkgs.lib.mkForce no;
+          CDROM = pkgs.lib.mkForce no;
+
+          # ISO/UDF media mounting
+          ISO9660_FS = pkgs.lib.mkForce no;
+          UDF_FS = pkgs.lib.mkForce no;
         };
       };
     in
