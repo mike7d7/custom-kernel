@@ -176,6 +176,84 @@
           # ISO/UDF media mounting
           ISO9660_FS = pkgs.lib.mkForce no;
           UDF_FS = pkgs.lib.mkForce no;
+
+          # Intel-only CPU
+          CPU_SUP_AMD = pkgs.lib.mkForce no;
+          CPU_SUP_HYGON = pkgs.lib.mkForce no;
+          CPU_SUP_CENTAUR = pkgs.lib.mkForce no;
+          CPU_SUP_ZHAOXIN = pkgs.lib.mkForce no;
+          KVM_AMD = pkgs.lib.mkForce no;
+          AMD_PMC = pkgs.lib.mkForce no;
+          AMD_PMF = pkgs.lib.mkForce no;
+          SENSORS_K10TEMP = pkgs.lib.mkForce no;
+          SENSORS_AMD_ENERGY = pkgs.lib.mkForce no;
+          EDAC_AMD64 = pkgs.lib.mkForce no;
+          X86_AMD_PLATFORM_DEVICE = pkgs.lib.mkForce no;
+          PINCTRL_AMD = pkgs.lib.mkForce no;
+
+          # virtio/hypervisor GUEST drivers
+          VIRTIO_PCI = pkgs.lib.mkForce no;
+          VIRTIO_NET = pkgs.lib.mkForce no;
+          VIRTIO_BLK = pkgs.lib.mkForce no;
+          VIRTIO_CONSOLE = pkgs.lib.mkForce no;
+          VIRTIO_BALLOON = pkgs.lib.mkForce no;
+          VIRTIO_INPUT = pkgs.lib.mkForce no;
+          VIRTIO_MMIO = pkgs.lib.mkForce no;
+          VMWARE_BALLOON = pkgs.lib.mkForce no;
+          # Keep: KVM_INTEL, TUN, BRIDGE, VHOST_NET
+
+          # Bluetooth: keep USB HCI + Intel
+          BT_HCIUART = pkgs.lib.mkForce no;
+          BT_HCIBCM203X = pkgs.lib.mkForce no;
+          BT_HCIBPA10X = pkgs.lib.mkForce no;
+          BT_HCIBFUSB = pkgs.lib.mkForce no;
+          BT_HCIVHCI = pkgs.lib.mkForce no;
+          BT_HCIDTL1 = pkgs.lib.mkForce no;
+          BT_HCIBT3C = pkgs.lib.mkForce no;
+          BT_HCIBLUECARD = pkgs.lib.mkForce no;
+          BT_HCIBTSDIO = pkgs.lib.mkForce no;
+          BT_ATH3K = pkgs.lib.mkForce no;
+          BT_MRVL = pkgs.lib.mkForce no;
+          BT_MRVL_SDIO = pkgs.lib.mkForce no;
+          # Keep: BT_HCIBTUSB, BT_INTEL
+
+          # Wired ethernet
+          NET_VENDOR_INTEL = pkgs.lib.mkForce no;
+          NET_VENDOR_REALTEK = pkgs.lib.mkForce no;
+          NET_VENDOR_BROADCOM = pkgs.lib.mkForce no;
+          NET_VENDOR_MARVELL = pkgs.lib.mkForce no;
+          NET_VENDOR_ATHEROS = pkgs.lib.mkForce no;
+          NET_VENDOR_MICROCHIP = pkgs.lib.mkForce no;
+          NET_VENDOR_QUALCOMM = pkgs.lib.mkForce no;
+          NET_VENDOR_NVIDIA = pkgs.lib.mkForce no;
+          NET_VENDOR_VIA = pkgs.lib.mkForce no;
+          NET_VENDOR_SIS = pkgs.lib.mkForce no;
+          NET_VENDOR_NATSEMI = pkgs.lib.mkForce no;
+          NET_VENDOR_AMD = pkgs.lib.mkForce no;
+          NET_VENDOR_3COM = pkgs.lib.mkForce no;
+          NET_VENDOR_DLINK = pkgs.lib.mkForce no;
+
+          # LUKS Crypto ciphers
+          CRYPTO_TWOFISH = pkgs.lib.mkForce no;
+          CRYPTO_SERPENT = pkgs.lib.mkForce no;
+          CRYPTO_BLOWFISH = pkgs.lib.mkForce no;
+          CRYPTO_CAST5 = pkgs.lib.mkForce no;
+          CRYPTO_CAST6 = pkgs.lib.mkForce no;
+          CRYPTO_CAMELLIA = pkgs.lib.mkForce no;
+          CRYPTO_ANUBIS = pkgs.lib.mkForce no;
+          CRYPTO_KHAZAD = pkgs.lib.mkForce no;
+          CRYPTO_SEED = pkgs.lib.mkForce no;
+          CRYPTO_FCRYPT = pkgs.lib.mkForce no;
+          CRYPTO_TEA = pkgs.lib.mkForce no;
+
+          # Single-socket CPU
+          NUMA = pkgs.lib.mkForce no;
+
+          # Exotic ABIs
+          X86_X32_ABI = pkgs.lib.mkForce no;
+
+          # No ECC RAM on my laptop
+          EDAC = pkgs.lib.mkForce no;
         };
       };
     in
