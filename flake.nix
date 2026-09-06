@@ -254,6 +254,10 @@
 
           # No ECC RAM on my laptop
           EDAC = pkgs.lib.mkForce no;
+
+          # Custom stuff
+          NTSYNC = yes;
+          V4L2_LOOPBACK = yes;
         };
       };
     in
