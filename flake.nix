@@ -235,11 +235,11 @@
 
           # LUKS Crypto ciphers
           CRYPTO_TWOFISH = pkgs.lib.mkForce no;
-          CRYPTO_SERPENT = pkgs.lib.mkForce no;
+          # CRYPTO_SERPENT = pkgs.lib.mkForce no;
           CRYPTO_BLOWFISH = pkgs.lib.mkForce no;
-          CRYPTO_CAST5 = pkgs.lib.mkForce no;
-          CRYPTO_CAST6 = pkgs.lib.mkForce no;
-          CRYPTO_CAMELLIA = pkgs.lib.mkForce no;
+          # CRYPTO_CAST5 = pkgs.lib.mkForce no;
+          # CRYPTO_CAST6 = pkgs.lib.mkForce no;
+          # CRYPTO_CAMELLIA = pkgs.lib.mkForce no;
           CRYPTO_ANUBIS = pkgs.lib.mkForce no;
           CRYPTO_KHAZAD = pkgs.lib.mkForce no;
           CRYPTO_SEED = pkgs.lib.mkForce no;
