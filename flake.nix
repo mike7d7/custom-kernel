@@ -159,6 +159,12 @@
           QNX6FS_FS = pkgs.lib.mkForce no;
           HPFS_FS = pkgs.lib.mkForce no;
           NILFS2_FS = pkgs.lib.mkForce no;
+          F2FS_FS = pkgs.lib.mkForce no;
+          XFS_FS = pkgs.lib.mkForce no;
+          JFS_FS = pkgs.lib.mkForce no;
+          REISERFS_FS = pkgs.lib.mkForce no;
+          HFS_FS = pkgs.lib.mkForce no;
+          HFSPLUS_FS = pkgs.lib.mkForce no;
 
           FIREWIRE = pkgs.lib.mkForce no;
           IEEE1394 = pkgs.lib.mkForce no;
