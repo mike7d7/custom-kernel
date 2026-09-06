@@ -86,6 +86,13 @@
           WLAN_VENDOR_ZYDAS = pkgs.lib.mkForce no;
           WLAN_VENDOR_MICROCHIP = pkgs.lib.mkForce no;
           WLAN_VENDOR_ST = pkgs.lib.mkForce no;
+          WLAN_VENDOR_ADMTEK = pkgs.lib.mkForce no;
+          WLAN_VENDOR_ATMEL = pkgs.lib.mkForce no;
+          WLAN_VENDOR_INTERSIL = pkgs.lib.mkForce no;
+          WLAN_VENDOR_PURELIFI = pkgs.lib.mkForce no;
+          WLAN_VENDOR_RSI = pkgs.lib.mkForce no;
+          WLAN_VENDOR_SILABS = pkgs.lib.mkForce no;
+          WLAN_VENDOR_QUANTENNA = pkgs.lib.mkForce no;
 
           # Legacy/unused bus & hardware support
           PARPORT = pkgs.lib.mkForce no;
