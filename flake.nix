@@ -314,7 +314,6 @@
 
           # Custom stuff
           NTSYNC = yes;
-          V4L2_LOOPBACK = yes;
         };
       };
     in
