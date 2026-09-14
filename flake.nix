@@ -364,7 +364,7 @@
 
           # Custom stuff
           NTSYNC = yes;
-          DRM_XE = yes;
+          DRM_XE = pkgs.lib.mkForce yes;
         };
       };
     in
