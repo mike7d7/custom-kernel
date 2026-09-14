@@ -41,6 +41,56 @@
           DRM_BOCHS = no;
           DRM_CIRRUS_QEMU = no;
 
+          DRM_I915 = pkgs.lib.mkForce no; # Use Xe driver
+          # Server/BMC graphics chips
+          DRM_AST = pkgs.lib.mkForce no;
+          DRM_MGAG200 = pkgs.lib.mkForce no;
+          DRM_HISI_HIBMC = pkgs.lib.mkForce no;
+          DRM_GMA500 = pkgs.lib.mkForce no;
+          DRM_COREBOOTDRM = pkgs.lib.mkForce no;
+
+          # VM-guest-only
+          DRM_VBOXVIDEO = pkgs.lib.mkForce no;
+          DRM_VGEM = pkgs.lib.mkForce no;
+          DRM_VKMS = pkgs.lib.mkForce no;
+
+          # Embedded/hobby displays
+          DRM_PANEL_AUO_A030JTN01 = pkgs.lib.mkForce no;
+          DRM_PANEL_FOCALTECH_OTA7290B = pkgs.lib.mkForce no;
+          DRM_PANEL_ILITEK_ILI9341 = pkgs.lib.mkForce no;
+          DRM_PANEL_ORISETECH_OTA5601A = pkgs.lib.mkForce no;
+          DRM_PANEL_RASPBERRYPI_TOUCHSCREEN = pkgs.lib.mkForce no;
+          DRM_PANEL_WIDECHIPS_WS2401 = pkgs.lib.mkForce no;
+          DRM_ST7571 = pkgs.lib.mkForce no;
+          DRM_ST7586 = pkgs.lib.mkForce no;
+          DRM_ST7735R = pkgs.lib.mkForce no;
+          DRM_ST7920 = pkgs.lib.mkForce no;
+          DRM_SSD130X = pkgs.lib.mkForce no;
+          DRM_PANEL_MIPI_DBI = pkgs.lib.mkForce no;
+          DRM_PIXPAPER = pkgs.lib.mkForce no;
+          DRM_MIPI_DBI = pkgs.lib.mkForce no;
+          DRM_GM12U320 = pkgs.lib.mkForce no;
+          TINYDRM_HX8357D = pkgs.lib.mkForce no;
+          TINYDRM_ILI9163 = pkgs.lib.mkForce no;
+          TINYDRM_ILI9225 = pkgs.lib.mkForce no;
+          TINYDRM_ILI9341 = pkgs.lib.mkForce no;
+          TINYDRM_ILI9486 = pkgs.lib.mkForce no;
+          TINYDRM_MI0283QT = pkgs.lib.mkForce no;
+          TINYDRM_REPAPER = pkgs.lib.mkForce no;
+          TINYDRM_SHARP_MEMORY = pkgs.lib.mkForce no;
+          DRM_APPLETBDRM = pkgs.lib.mkForce no;
+
+          # Embedded HDMI/DP encoder+bridge chips
+          DRM_I2C_NXP_TDA998X = pkgs.lib.mkForce no;
+          DRM_AUX_BRIDGE = pkgs.lib.mkForce no;
+          DRM_AUX_HPD_BRIDGE = pkgs.lib.mkForce no;
+
+          # AI cards
+          DRM_ACCEL_AMDXDNA = pkgs.lib.mkForce no;
+          DRM_ACCEL_HABANALABS = pkgs.lib.mkForce no;
+          DRM_ACCEL_QAIC = pkgs.lib.mkForce no;
+          DRM_ACCEL_IVPU = pkgs.lib.mkForce no;
+
           # ALSA SoC framework
           SND_SOC = no;
 
@@ -314,6 +364,7 @@
 
           # Custom stuff
           NTSYNC = yes;
+          DRM_XE = yes;
         };
       };
     in
