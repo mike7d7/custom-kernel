@@ -20,7 +20,7 @@
   in {
     packages.${system}.default = let
       kernelSet = pkgs.cachyosKernels.linux-cachyos-latest.override {
-        cpusched = "bore";
+        cpusched = "eevdf";
         lto = "full";
         processorOpt = "x86_64-v3";
         hzTicks = "1000";
